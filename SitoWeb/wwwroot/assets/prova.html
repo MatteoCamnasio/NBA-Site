@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squadre NBA</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: white;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .menu-toggle {
+            background-color: #A00E1A;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 3;
+            transition: background-color 0.3s ease-in-out;
+        }
+        .menu-toggle.active {
+            background-color: #003366;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #003366;
+            color: white;
+            position: fixed;
+            padding-top: 20px;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 2;
+        }
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        .header {
+            background-color: #A00E1A;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 0;
+        }
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: auto;
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            margin-top: 20px;
+        }
+        .team-card {
+            width: 200px;
+            height: 250px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid black;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .team-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            background-color: gray;
+            object-fit: contain;
+        }
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 600px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            display: none;
+            z-index: 10;
+        }
+        .popup .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>NBA Hub</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="leghe.html">Leghe</a></li>
+            <li><a href="campionati.html">Campionati</a></li>
+            <li class="active"><a href="squadre.html">Squadre</a></li>
+            <li><a href="giocatori.html">Giocatori</a></li>
+        </ul>
+    </div>
+    <div class="header">Squadre NBA</div>
+    <div style="text-align:center; margin: 20px;">
+        <label for="teamInput">Inserisci il nome della squadra: </label>
+        <input type="text" id="teamInput" placeholder="Es. Los Angeles Lakers">
+        <button id="submitButton">Invia</button>
+    </div>
+    <div class="container" id="content">
+        <div class="grid" id="teamsGrid"></div>
+    </div>
+    <div class="popup" id="teamPopup">
+        <button class="close-btn" onclick="closePopup()">X</button>
+        <div id="teamDetails"></div>
+    </div>
+    <script>
+        document.getElementById("submitButton").addEventListener("click", searchTeams);
+        document.getElementById("teamInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchTeams();
+            }
+        });
+        
+        function searchTeams() {
+            const teamName = document.getElementById("teamInput").value.trim();
+            if (teamName) {
+                fetchTeamDetails(teamName);
+            }
+        }
+
+        async function fetchTeamDetails(teamName) {
+            const url = `https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${encodeURIComponent(teamName)}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.teams && data.teams.length > 0) {
+                    const team = data.teams[0];
+                    document.getElementById("teamDetails").innerHTML = `
+                        <h2>${team.strTeam}</h2>
+                        <img src="${team.strTeamBadge}" class="team-logo" alt="${team.strTeam} Logo">
+                        <p><strong>Stadio:</strong> ${team.strStadium}</p>
+                        <p><strong>Città:</strong> ${team.strStadiumLocation}</p>
+                        <p><strong>Descrizione:</strong> ${team.strDescriptionIT || team.strDescriptionEN}</p>
+                    `;
+                    document.getElementById("teamPopup").style.display = "block";
+                }
+            } catch (error) {
+                console.error("Errore nel recupero dati:", error);
+            }
+        }
+
+        function closePopup() {
+            document.getElementById("teamPopup").style.display = "none";
+        }
+    </script>
+</body>
+</html>

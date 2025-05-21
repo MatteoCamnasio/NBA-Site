@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sito NBA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container-video" id="containerVideo">
+        <video class="video-sfondo" src="../assets/homeVideo.mp4" autoplay loop muted></video>
+    </div>
+
+    <button class="pulsante-menu" id="pulsanteMenu">☰</button>
+
+    <div class="menu-laterale" id="menuLaterale">
+        <button class="pulsante-chiudi" id="pulsanteChiudi">☰</button>
+        <h2>NBA Hub</h2>
+        <ul>
+            <li class="attivo"><a href="home.html">Home</a></li>
+            <li><a href="squadre.html">Squadre</a></li>
+            <li><a href="giocatori.html">Giocatori</a></li>
+            <li><a href="match.html">Match</a></li>
+        </ul>
+    </div>
+
+    <div class="intestazione">
+        NBA <img src="../assets/nba_logo.png" alt="NBA Logo">
+    </div>
+
+    <div class="contenuto" id="contenuto">
+        <h1>Storia dell'NBA</h1>
+        <p>
+            La National Basketball Association (NBA) è la principale lega di basket professionistico negli Stati Uniti e nel mondo. Fondata nel 1946 a New York City come Basketball Association of America (BAA), la lega ha adottato il nome di NBA nel 1949 dopo la fusione con la rival National Basketball League (NBL).
+        </p>
+        <p>
+            L'NBA è composta da 30 squadre, divise in due conference: la Eastern Conference e la Western Conference. Ogni conference è ulteriormente suddivisa in tre divisioni. La stagione regolare si svolge da ottobre ad aprile, seguita dai playoff che culminano nelle NBA Finals, dove si affrontano i campioni delle due conference.
+        </p>
+        <p>
+            Nel corso degli anni, l'NBA ha visto l'ascesa di numerose leggende del basket, tra cui Bill Russell, Wilt Chamberlain, Magic Johnson, Larry Bird, Michael Jordan, Kobe Bryant e LeBron James. Questi giocatori hanno contribuito a rendere l'NBA una delle leghe sportive più popolari e seguite al mondo.
+        </p>
+        <p>
+            Oltre al successo sportivo, l'NBA è anche nota per il suo impegno sociale e comunitario. La lega ha promosso numerose iniziative per migliorare la vita delle persone attraverso lo sport, inclusi programmi educativi, di salute e di inclusione sociale.
+        </p>
+        <p>
+            Oggi, l'NBA continua a crescere a livello globale, con milioni di fan in tutto il mondo e una presenza sempre più forte sui social media e nelle piattaforme digitali. La lega è anche all'avanguardia nell'uso della tecnologia, con l'introduzione di sistemi di replay avanzati e l'analisi dei dati per migliorare l'esperienza degli spettatori e delle squadre.
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('pulsanteMenu').addEventListener('click', function() {
+            var menuLaterale = document.getElementById('menuLaterale');
+            var contenuto = document.getElementById('contenuto');
+            menuLaterale.classList.toggle('attivo');
+            contenuto.classList.toggle('spostato');
+        });
+
+        document.getElementById('pulsanteChiudi').addEventListener('click', function() {
+            var menuLaterale = document.getElementById('menuLaterale');
+            var contenuto = document.getElementById('contenuto');
+            menuLaterale.classList.remove('attivo');
+            contenuto.classList.remove('spostato');
+        });
+    </script>
+</body>
+</html>

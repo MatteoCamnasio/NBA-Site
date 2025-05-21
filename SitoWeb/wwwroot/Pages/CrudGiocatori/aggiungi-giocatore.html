@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiungi Giocatore</title>
+    <link rel="stylesheet" href="../styleAggiungiGiocatore.css">
+    <style>
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+       
+    </style>
+</head>
+<body>
+    <button id="backButton">&#8592;</button>
+    <div class="container">
+        <h2>Aggiungi un Nuovo Giocatore</h2>
+        
+        <form id="playerForm">
+            <label for="playerName">Nome e Cognome:</label>
+            <input type="text" id="playerName" placeholder="Es. LeBron James">
+            
+            <label for="strTeam">Squadra:</label>
+            <input type="text" id="strTeam" placeholder="Es: Chicago Bulls">
+            
+            <label for="strPosition">Ruolo:</label>
+            <input type="text" id="strPosition" placeholder="Es: Small Forward">
+            
+            <label for="strNationality">Nazionalità:</label>
+            <input type="text" id="strNationality" placeholder="Es: Italiana">
+            
+            <label for="strBirthDate">Data di Nascita:</label>
+            <input type="date" id="strBirthDate">
+            
+            <label for="strHeight">Altezza (cm):</label>
+            <input type="number" id="strHeight" placeholder="Es. 206">
+            
+            <label for="strWeight">Peso (kg):</label>
+            <input type="number" id="strWeight" placeholder="Es. 113">
+            
+            <label for="strDescriptionEN">Descrizione del Giocatore:</label>
+            <textarea id="strDescriptionEN" maxlength="10000" placeholder="Inserisci una descrizione del giocatore..."></textarea>
+            
+            <button type="submit" id="submitPlayer">Invia</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("playerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const fields = [
+                { id: "playerName", label: "Nome e Cognome" },
+                { id: "strTeam", label: "Squadra" },
+                { id: "strPosition", label: "Ruolo" },
+                { id: "strNationality", label: "Nazionalità" },
+                { id: "strBirthDate", label: "Data di Nascita" },
+                { id: "strHeight", label: "Altezza" },
+                { id: "strWeight", label: "Peso" },
+                { id: "strDescriptionEN", label: "Descrizione" }
+            ];
+
+            let missingFields = [];
+
+            fields.forEach(field => {
+                const inputElement = document.getElementById(field.id);
+                if (!inputElement.value.trim()) {
+                    missingFields.push(field.label);
+                    inputElement.classList.add("error");
+                } else {
+                    inputElement.classList.remove("error");
+                }
+            });
+
+            if (missingFields.length > 0) {
+                alert("Compila tutti i campi!\nMancano i seguenti campi: " + missingFields.join(", "));
+            } else {
+                const teamName = document.getElementById("strTeam").value;
+
+                fetch(`/squadre?nome=${encodeURIComponent(teamName)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const team = data.find(t => t.nome.toLowerCase() === teamName.toLowerCase());
+                        if (!team) {
+                            throw new Error('Squadra non trovata');
+                        }
+                        const teamId = team.squadraId;
+
+                        const playerData = {
+                            giocatoreName: document.getElementById("playerName").value,
+                            squadraId: teamId,
+                            ruolo: document.getElementById("strPosition").value,
+                            nazionalita: document.getElementById("strNationality").value,
+                            dataNascita: document.getElementById("strBirthDate").value,
+                            altezza: document.getElementById("strHeight").value,
+                            peso: document.getElementById("strWeight").value,
+                            descrizione: document.getElementById("strDescriptionEN").value
+                        };
+
+                        return fetch('/giocatori', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(playerData)
+                        });
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert(`Giocatore "${data.giocatoreName}" aggiunto con successo!`);
+                        window.location.href = "../giocatori.html"; 
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Si è verificato un errore durante l\'aggiunta del giocatore.');
+                    });
+            }
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../giocatori.html';
+        });
+    </script>
+</body>
+</html>

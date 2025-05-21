@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giocatori NBA</title>
+    <link rel="stylesheet" href="styleGiocatori.css">
+
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>NBA Hub</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="squadre.html">Squadre</a></li>
+            <li class="active"><a href="giocatori.html">Giocatori</a></li>
+            <li><a href="match.html">Match</a></li>
+        </ul>
+    </div>
+    <div class="header">Giocatori NBA</div>
+    <div class="search-container">
+        <label for="playerInput" class="large-label">Inserisci il nome del giocatore:</label>
+        <input type="text" id="playerInput" class="large-input" placeholder="Es. LeBron James">
+        <button id="submitButton" class="search-button">Invia</button>
+        <button style="background-color: blue;" class="blue-button" id="addPlayerButton" onclick="location.href='CrudGiocatori/cercaGiocatoriDb.html'">Cerca Giocatori Db</button>
+        <button style="background-color: green;" class="blue-button" id="addPlayerButton" onclick="location.href='CrudGiocatori/aggiungi-giocatore.html'">Aggiungi Giocatore</button>
+
+    </div>      
+    <div class="container" id="content">
+    </div>
+    <div id="overlay" class="overlay">
+        <div class="overlay-content">
+            <span id="closeOverlay" class="close">&times;</span>
+            <div id="playerDetails"></div>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById('sidebar');
+            var content = document.getElementById('content');
+            var menuToggle = document.getElementById('menuToggle');
+            sidebar.classList.toggle('active');
+            content.classList.toggle('shifted');
+            menuToggle.classList.toggle('active');
+        }
+
+        document.getElementById("submitButton").addEventListener("click", searchPlayerDetails);
+        document.getElementById("playerInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchPlayerDetails();
+            }
+        });
+
+        async function searchPlayerDetails() {
+            const playerName = document.getElementById("playerInput").value.trim();
+            if (playerName) {
+                const url = `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(playerName)}`;
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.player) {
+                        const player = data.player[0];
+                        if (player) {
+                            showPlayerDetails(player);
+                        } else {
+                            alert("Giocatore non trovato. Verifica il nome e riprova.");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Errore nel recupero dati:", error);
+                }
+            } else {
+                alert("Inserisci il nome di un giocatore.");
+            }
+        }
+
+        function showPlayerDetails(player) {
+            const overlay = document.getElementById("overlay");
+            const playerDetails = document.getElementById("playerDetails");
+            playerDetails.innerHTML = `
+                <h2>${player.strPlayer}</h2>
+                <img src="${player.strThumb}" alt="${player.strPlayer} Foto" style="width: 100px; height: 100px;">
+                <p><strong>Squadra:</strong> ${player.strTeam}</p>
+                <p><strong>Posizione:</strong> ${player.strPosition}</p>
+                <p><strong>Nazionalità:</strong> ${player.strNationality}</p>
+                <p><strong>Data di nascita:</strong> ${player.dateBorn}</p>
+                <p><strong>Altezza:</strong> ${player.strHeight}</p>
+                <p><strong>Peso:</strong> ${player.strWeight}</p>
+                <p class="justified-text"><strong>Descrizione:</strong> ${player.strDescriptionEN}</p>
+            `;
+            overlay.style.display = "flex";
+        }
+
+        document.getElementById("closeOverlay").addEventListener("click", () => {
+            document.getElementById("overlay").style.display = "none";
+        });
+    </script>
+</body>
+</html>

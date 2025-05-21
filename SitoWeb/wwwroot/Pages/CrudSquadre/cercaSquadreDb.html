@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squadre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            position: relative;
+        }
+        .squadra {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            width: 250px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .squadra h2 {
+            margin: 0;
+            color: #333;
+        }
+        .squadra p {
+            margin: 5px 0;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="backButton">&#8592;</button>
+    <script>
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../squadre.html';
+        });
+
+        fetch('/squadre')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dati ricevuti:', data);
+                const teams = data; 
+                const container = document.createElement('div');
+                container.style.display = 'flex';
+                container.style.flexWrap = 'wrap';
+                container.style.justifyContent = 'center';
+                container.style.gap = '20px';
+                teams.forEach(team => {
+                    const squadra = document.createElement('div');
+                    squadra.classList.add('squadra');
+                    squadra.innerHTML = `
+                        <h2>${team.nome}</h2>
+                        <p><strong>Città:</strong> ${team.citta}</p>
+                        <p><strong>Stadio:</strong> ${team.stadio }</p>
+                        <p><strong>Anno di Fondazione:</strong> ${team.annoFondazione }</p>
+                        <p><strong>Descrizione:</strong> ${team.descrizione }</p>
+                    `;
+                    container.appendChild(squadra);
+                });
+                document.body.appendChild(container);
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+            });
+    </script>
+</body>
+</html>

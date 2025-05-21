@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squadre NBA</title>
+    <link rel="stylesheet" href="styleSquadre.css">
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>NBA Hub</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li class="active"><a href="squadre.html">Squadre</a></li>
+            <li><a href="giocatori.html">Giocatori</a></li>
+            <li><a href="match.html">Match</a></li>
+        </ul>
+    </div>
+    <div class="header">Squadre NBA</div>
+    <div class="search-container">
+        <label for="teamInput" class="large-label">Inserisci il nome della squadra:</label>
+        <input type="text" id="teamInput" class="large-input" placeholder="Es. Los Angeles Lakers">
+        <button id="submitButton" class="search-button">Invia</button>
+        <button style="background-color: blue;" id="searchTeamDbButton" class="blue-button" onclick="location.href='CrudSquadre/cercaSquadreDb.html'">Cerca Squadra nel DB</button>
+        <button style="background-color: green;" id="addTeamButton" class="blue-button" onclick="location.href='CrudSquadre/aggiungi-squadra.html'">Aggiungi Squadra</button>
+        <button style="background-color: orange;" id="editTeamButton" class="blue-button" onclick="location.href='CrudSquadre/modificaSquadreDb.html'">Modifica Squadra</button>
+        <button style="background-color: red;" id="deleteTeamButton"  class="blue-button" onclick="location.href='CrudSquadre/eliminaSquadreDb.html'">Elimina Squadra</button>
+    </div>
+    
+    <div class="container" id="content">
+        <div class="grid" id="teamsGrid"></div>
+    </div>
+    
+    <div id="overlay" class="overlay">
+        <div class="overlay-content">
+            <span id="closeOverlay" class="close">&times;</span>
+            <div id="teamDetails"></div>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById('sidebar');
+            var content = document.getElementById('content');
+            var menuToggle = document.getElementById('menuToggle');
+            sidebar.classList.toggle('active');
+            content.classList.toggle('shifted');
+            menuToggle.classList.toggle('active');
+        }
+
+        document.getElementById("submitButton").addEventListener("click", searchTeamDetails);
+        document.getElementById("teamInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchTeamDetails();
+            }
+        });
+
+        
+        fetchTeams();
+
+        async function fetchTeams() {
+            const url = `https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l=NBA`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.teams) {
+                    displayTeams(data.teams);
+                }
+            } catch (error) {
+                console.error("Errore nel recupero dati:", error);
+            }
+        }
+
+        function displayTeams(teams) {
+            const grid = document.getElementById("teamsGrid");
+            grid.innerHTML = "";
+            teams.forEach(team => {
+                const teamCard = document.createElement("div");
+                teamCard.classList.add("team-card");
+                teamCard.innerHTML = `
+                    <img src="${team.strBadge}" class="team-logo" alt="${team.strTeam} Logo">
+                    <p><strong>${team.strTeam}</strong></p>
+                    <p><strong>Stadio:</strong> ${team.strStadium}</p>
+                    <p><strong>Città:</strong> ${team.strLocation}</p>
+                `;
+                teamCard.addEventListener("click", () => showTeamDetails(team));
+                grid.appendChild(teamCard);
+            });
+        }
+
+        async function searchTeamDetails() {
+            const teamName = document.getElementById("teamInput").value.trim();
+            if (teamName) {
+                const url = `https://www.thesportsdb.com/api/v1/json/3/search_all_teams.php?l=NBA`;
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.teams) {
+                        const team = data.teams.find(t => t.strTeam.toLowerCase() === teamName.toLowerCase());
+                        if (team) {
+                            showTeamDetails(team);
+                        } 
+                        else
+                         {
+                            alert("Squadra non trovata. Verifica il nome e riprova.");
+                        }
+                    }
+                } catch (error) {
+                    console.error("Errore nel recupero dati:", error);
+                }
+            } else {
+                alert("Inserisci il nome di una squadra.");
+            }
+        }
+
+        function showTeamDetails(team) {
+            const overlay = document.getElementById("overlay");
+            const teamDetails = document.getElementById("teamDetails");
+            teamDetails.innerHTML = `
+                <h2>${team.strTeam}</h2>
+                <img src="${team.strBadge}" alt="${team.strTeam} Logo" style="width: 100px; height: 100px;">
+                <p><strong>Stadio:</strong> ${team.strStadium}</p>
+                <p><strong>Città:</strong> ${team.strLocation}</p>
+                <p><strong>Anno di fondazione:</strong> ${team.intFormedYear}</p>
+                <p><strong>Descrizione:</strong> ${team.strDescriptionEN}</p>
+            `;
+            overlay.style.display = "flex";
+        }
+
+        document.getElementById("closeOverlay").addEventListener("click", () => {
+            document.getElementById("overlay").style.display = "none";
+        });
+    </script>
+</body>
+</html>

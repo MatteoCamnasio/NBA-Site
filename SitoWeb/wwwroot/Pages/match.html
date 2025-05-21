@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimi Match di una Squadra</title>
+    <link rel="stylesheet" href="styleMatch.css">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <button class="menu-toggle" id="menuToggle" onclick="toggleMenu()">☰</button>
+    <div class="sidebar" id="sidebar">
+        <h2>NBA Hub</h2>
+        <ul>
+            <li><a href="home.html">Home</a></li>
+            <li><a href="squadre.html">Squadre</a></li>
+            <li ><a href="giocatori.html">Giocatori</a></li>
+            <li class="active"><a href="match.html">Match</a></li>
+        </ul>
+    </div>
+    <div class="header">Match NBA</div>
+    <div class="search-container">
+        <label for="teamInput" class="large-label">Inserisci il nome della squadra:</label>
+        <input type="text" id="teamInput" class="large-input" placeholder="Es. Los Angeles Lakers">
+        <button id="submitButton" class="search-button">Invia</button>
+    </div>
+    <div class="container" id="content"></div>
+    <script>
+        function toggleMenu() {
+            var sidebar = document.getElementById('sidebar');
+            var content = document.getElementById('content');
+            var menuToggle = document.getElementById('menuToggle');
+            sidebar.classList.toggle('active');
+            content.classList.toggle('shifted');
+            menuToggle.classList.toggle('active');
+        }
+
+        document.getElementById("submitButton").addEventListener("click", searchTeamMatches);
+        document.getElementById("teamInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchTeamMatches();
+            }
+        });
+
+        async function searchTeamMatches() {
+            const teamName = document.getElementById("teamInput").value.trim();
+            if (!teamName) {
+                alert("Inserisci il nome di una squadra.");
+                return;
+            }
+            
+            try {
+                const teamResponse = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchteams.php?t=${teamName}`);
+                const teamData = await teamResponse.json();
+                if (!teamData.teams) {
+                    alert("Squadra non trovata. Verifica il nome e riprova.");
+                    return;
+                }
+                
+                const teamId = teamData.teams[0].idTeam;
+                fetchMatches(teamId);
+            } catch (error) {
+                console.error("Errore nel recupero della squadra:", error);
+            }
+        }
+
+        async function fetchMatches(teamId) {
+            try {
+                const matchResponse = await fetch(`https://www.thesportsdb.com/api/v1/json/3/eventslast.php?id=${teamId}`);
+                const matchData = await matchResponse.json();
+                if (!matchData.results) {
+                    alert("Nessun match trovato per questa squadra.");
+                    return;
+                }
+                displayMatches(matchData.results);
+            } catch (error) {
+                console.error("Errore nel recupero dei match:", error);
+            }
+        }
+
+        function displayMatches(matches) {
+            if (!matches || matches.length === 0) return;
+            const content = document.getElementById("content");
+            content.innerHTML = `<h2>Ultimi Match</h2>`;
+            matches.forEach(match => {
+                content.innerHTML += `
+                    <div class="match">
+                        <div class="match-row">
+                            <img src="${match.strHomeTeamBadge}" alt="${match.strHomeTeam}" class="team-badge">
+                            <span class="match-teams">${match.strHomeTeam} vs ${match.strAwayTeam}</span>
+                            <img src="${match.strAwayTeamBadge}" alt="${match.strAwayTeam}" class="team-badge">
+                            <span class="match-score">${match.intHomeScore} - ${match.intAwayScore}</span>
+                            <span class="match-date">${match.dateEvent}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

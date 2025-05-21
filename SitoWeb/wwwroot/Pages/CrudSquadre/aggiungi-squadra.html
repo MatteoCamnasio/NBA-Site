@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggiungi Squadra</title>
+    <link rel="stylesheet" href="../styleAggiungiSquadra.css">
+    <style>
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="backButton">&#8592;</button>
+    <div class="container">
+        <h2>Aggiungi una Nuova Squadra</h2>
+
+        <form id="teamForm">
+            <label for="strName">Nome Squadra:</label>
+            <input type="text" id="strName" placeholder="Es. Los Angeles Lakers">
+            
+            <label for="strLocation">Città:</label>
+            <input type="text" id="strLocation" placeholder="Es. Los Angeles">
+            
+            <label for="strStadium">Stadio:</label>
+            <input type="text" id="strStadium" placeholder="Es. Staples Center">
+            
+            <label for="intFormedYear">Anno di Fondazione:</label>
+            <input type="number" id="intFormedYear" placeholder="Es. 1947">
+            
+            <label for="strDescriptionEN">Descrizione della Squadra:</label>
+            <textarea id="strDescriptionEN" maxlength="10000" placeholder="Inserisci una descrizione della squadra..."></textarea>
+            
+            <button type="submit" id="submitTeam">Invia</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('teamForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const strName = document.getElementById('strName').value;
+            const strLocation = document.getElementById('strLocation').value;
+            const strStadium = document.getElementById('strStadium').value;
+            const intFormedYear = document.getElementById('intFormedYear').value;
+            const strDescriptionEN = document.getElementById('strDescriptionEN').value;
+
+            fetch('/squadre', {
+                method: 'POST',
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    Nome: strName, 
+                    Citta: strLocation, 
+                    Stadio: strStadium, 
+                    AnnoFondazione: intFormedYear, 
+                    Descrizione: strDescriptionEN 
+                })
+            }).then(response => response.json())
+                .then(data => {
+                    alert('Squadra aggiunta con successo!');
+                    document.getElementById('teamForm').reset();
+                    window.location.href = '../squadre.html';
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante l\'aggiunta della squadra.');
+                });
+        });
+        
+    </script>
+</body>
+</html>

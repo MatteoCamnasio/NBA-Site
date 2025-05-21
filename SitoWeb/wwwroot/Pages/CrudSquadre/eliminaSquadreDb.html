@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elimina Squadra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 300px;
+        }
+        .form-container input, .form-container button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="backButton">&#8592;</button>
+    <h1>Elimina Squadra</h1>
+    <div class="form-container">
+        <label for="teamName">Nome Squadra:</label>
+        <input type="text" id="teamName" placeholder="Inserisci il nome della squadra">
+        <button id="deleteButton">Elimina Squadra</button>
+    </div>
+
+    <script>
+        document.getElementById('deleteButton').addEventListener('click', function() {
+            const teamName = document.getElementById('teamName').value.trim();
+
+            if (!teamName) {
+                alert('Per favore, inserisci il nome della squadra.');
+                return;
+            }
+
+            const confirmDelete = confirm(`Sei sicuro di voler eliminare la squadra "${teamName}"?`);
+            if (!confirmDelete) {
+                return;
+            }
+
+            fetch('/squadre')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const team = data.find(t => t.nome.toLowerCase() === teamName.toLowerCase());
+                    if (!team) {
+                        throw new Error('Squadra non trovata');
+                    }
+                    const teamId = team.squadraId;
+
+                    return fetch(`/squadre/${teamId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(`Squadra "${teamName}" eliminata con successo!`);
+                    document.getElementById('teamName').value = '';
+                })
+                        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../squadre.html';
+        });
+    </script>
+</body>
+</html>

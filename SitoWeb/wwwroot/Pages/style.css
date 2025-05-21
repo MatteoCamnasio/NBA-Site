@@ -1,0 +1,148 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #F5F5F5;
+    overflow-x: hidden;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.container-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.video-sfondo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pulsante-menu {
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 4;
+    transition: color 0.3s;
+}
+
+.pulsante-menu:hover {
+    color: #003366;
+}
+
+.menu-laterale {
+    width: 250px;
+    height: 100vh;
+    background-color: #003366;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding-top: 20px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 3;
+}
+
+.menu-laterale.attivo {
+    transform: translateX(0);
+    z-index: 4;
+}
+
+.menu-laterale h2 {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.menu-laterale ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-laterale ul li {
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    color: white;
+}
+
+.menu-laterale ul li:hover {
+    background-color: #0056b3;
+}
+
+.menu-laterale ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+}
+
+.menu-laterale .pulsante-chiudi {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.menu-laterale .pulsante-chiudi:hover {
+    color: #C8102E;
+}
+
+.intestazione {
+    background-color: #A00E1A;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 3;
+}
+
+.intestazione img {
+    height: 40px;
+}
+
+.contenuto {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: auto;
+    padding: 120px 20px 20px;
+    color: white;
+    transition: margin-left 0.3s ease-in-out;
+    margin-top: 70vh;
+}
+
+.contenuto.spostato {
+    margin-left: 250px;
+}
+
+p {
+    font-size: 30px;
+}
+

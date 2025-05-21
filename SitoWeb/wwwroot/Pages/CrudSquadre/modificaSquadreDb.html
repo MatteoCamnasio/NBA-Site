@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica Squadra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 300px;
+        }
+        .form-container input, .form-container button {
+            padding: 10px;
+            font-size: 16px;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="backButton">&#8592;</button>
+    <h1>Modifica Squadra</h1>
+    <div class="form-container">
+        <label for="searchName">Cerca Squadra per Nome:</label>
+        <input type="text" id="searchName" placeholder="Inserisci il nome della squadra">
+        <button id="searchButton">Cerca</button>
+    </div>
+    <div class="form-container" id="teamFormContainer" style="display: none;">
+        <label for="strName">Nome Squadra:</label>
+        <input type="text" id="strName">
+        
+        <label for="strLocation">Città:</label>
+        <input type="text" id="strLocation">
+        
+        <label for="strStadium">Stadio:</label>
+        <input type="text" id="strStadium">
+        
+        <label for="intFormedYear">Anno di Fondazione:</label>
+        <input type="number" id="intFormedYear">
+        
+        <label for="strDescriptionEN">Descrizione della Squadra:</label>
+        <textarea id="strDescriptionEN" maxlength="10000"></textarea>
+        
+        <button id="saveButton">Salva</button>
+    </div>
+
+    <script>
+        let teamId = null;
+
+        document.getElementById('searchButton').addEventListener('click', function() {
+            const searchName = document.getElementById('searchName').value.trim();
+
+            if (!searchName) {
+                alert('Per favore, inserisci il nome della squadra.');
+                return;
+            }
+
+            fetch('/squadre')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const team = data.find(t => t.nome.toLowerCase() === searchName.toLowerCase());
+                    if (!team) {
+                        throw new Error('Squadra non trovata');
+                    }
+                    teamId = team.squadraId;
+                    document.getElementById('strName').value = team.nome;
+                    document.getElementById('strLocation').value = team.citta;
+                    document.getElementById('strStadium').value = team.stadio;
+                    document.getElementById('intFormedYear').value = team.annoFondazione;
+                    document.getElementById('strDescriptionEN').value = team.descrizione;
+                    document.getElementById('teamFormContainer').style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante la ricerca della squadra.');
+                });
+        });
+
+        document.getElementById('saveButton').addEventListener('click', function() {
+            if (!teamId) {
+                alert('Per favore, cerca una squadra prima di salvare.');
+                return;
+            }
+
+            const updatedTeam = {
+                nome: document.getElementById('strName').value,
+                citta: document.getElementById('strLocation').value,
+                stadio: document.getElementById('strStadium').value,
+                annoFondazione: document.getElementById('intFormedYear').value,
+                descrizione: document.getElementById('strDescriptionEN').value
+            };
+
+            fetch(`/squadre/${teamId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedTeam)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Squadra aggiornata con successo!');
+                window.location.href = '../squadre.html';
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                alert('Si è verificato un errore durante l\'aggiornamento della squadra.');
+            });
+        });
+
+        document.getElementById('backButton').addEventListener('click', function() {
+            window.location.href = '../squadre.html';
+        });
+    </script>
+</body>
+</html>
